@@ -1,11 +1,9 @@
-import { createPool } from '@vercel/postgres';
 import type { PageServerLoad } from './$types';
-import { POSTGRES_URL } from '$env/static/private';
+import { getUnpublished } from '$lib/server/db';
+import { createClient } from '@vercel/postgres';
 
-const client = createPool({ connectionString: POSTGRES_URL });
 export const load: PageServerLoad = async () => {
 	return {
-		all_items:
-			await client.sql`SELECT * FROM uploads LEFT JOIN users u on uploads.userid = u.userid`
+		initial_items: await getUnpublished()
 	};
 };

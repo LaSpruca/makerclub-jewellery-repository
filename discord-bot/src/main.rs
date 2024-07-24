@@ -39,9 +39,10 @@ impl DbConnection {
         user_id: u64,
         username: String,
         nickname: Option<String>,
+        avatar_url: String,
     ) -> anyhow::Result<()> {
-        sqlx::query!("INSERT INTO users (userid, username, nickname) VALUES ($1, $2, $3) ON CONFLICT (userid) DO UPDATE SET username = EXCLUDED.username, nickname = EXCLUDED.nickname", 
-            u64_to_i64(user_id), username, nickname).execute(&self.db).await?;
+        sqlx::query!("INSERT INTO users (userid, username, nickname, avatar_url) VALUES ($1, $2, $3, $4) ON CONFLICT (userid) DO UPDATE SET username = EXCLUDED.username, nickname = EXCLUDED.nickname", 
+            u64_to_i64(user_id), username, nickname, avatar_url).execute(&self.db).await?;
         Ok(())
     }
 
@@ -54,8 +55,10 @@ impl DbConnection {
         svg_url: String,
         title: String,
         description: String,
+        avatar_url: String,
     ) -> anyhow::Result<()> {
-        self.upsert_user(user_id, username, nickname).await?;
+        self.upsert_user(user_id, username, nickname, avatar_url)
+            .await?;
 
         sqlx::query!("INSERT INTO uploads (id, userid, title, description, svg_url, thumbnail_url) VALUES ($1, $2, $3, $4, $5, $6)", nanoid!(20), u64_to_i64(user_id), title, description, svg_url, thumbnail_url).execute(&self.db).await?;
 
@@ -79,6 +82,10 @@ async fn submit_jewellery(
     let username = author.name.clone();
     let userid = author.id.get();
     let nickname = ctx.author_member().await.and_then(|user| user.nick.clone());
+    let avatar = author
+        .avatar_url()
+        .unwrap_or_else(|| author.default_avatar_url());
+
     let db = DB.get().expect("Could not get DB, accessed before set");
 
     info!("Uploaded image by {nickname:?} ({username}): \"{title}: {description}\" (thumbnail: {}, svg: {})", thumbnail.url, svg.url);
@@ -90,6 +97,7 @@ async fn submit_jewellery(
         svg.url,
         title,
         description,
+        avatar,
     )
     .await?;
 
