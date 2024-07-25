@@ -14,8 +14,8 @@ export const POST: RequestHandler = async ({ cookies, params }) => {
 		error(404, 'Not found');
 	}
 
-	if (!design.published) {
-		error(400, 'Already not published');
+	if (design.published) {
+		error(400, 'Already published');
 	}
 
 	await setPublished(params.design_id, true);

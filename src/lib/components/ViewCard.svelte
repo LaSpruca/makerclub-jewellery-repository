@@ -39,12 +39,30 @@
 					>
 						Accept
 					</button>
-					<button class="btn btn-error">Reject</button>
+					<button
+						class="btn btn-error"
+						on:click={async () => {
+							if (confirm('Do you really want to delete this item. This action is irreversable')) {
+								const result = await fetch(`/${item.id}/reject`, { method: 'POST' });
+								if (result.status != 200) {
+									alert(`Could not publish item ${await result.text()} (${result.status})`);
+									return;
+								}
+
+								items.update((items) => {
+									items.splice(index, 1);
+									return items;
+								});
+							}
+						}}
+					>
+						Reject
+					</button>
 				{:else}
 					<button
 						class="btn btn-error"
 						on:click={async () => {
-							const result = await fetch(`/${item.id}/publish`, { method: 'POST' });
+							const result = await fetch(`/${item.id}/unpublish`, { method: 'POST' });
 							if (result.status != 200) {
 								alert(`Could not publish item ${await result.text()} (${result.status})`);
 								return;
@@ -56,9 +74,9 @@
 						Unpublish
 					</button>
 				{/if}
-				<a class="btn btn-primary" href={item.svg_url} download="{item.title}.svg"
-					>Download design file</a
-				>
+				<a class="btn btn-primary" href={item.svg_url} download="{item.title}.svg">
+					Download design file
+				</a>
 			{:else}
 				<a class="btn btn-primary" href={item.svg_url} download="{item.title}.svg">
 					Get this design

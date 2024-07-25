@@ -87,7 +87,17 @@ export async function getDesign(id: string) {
  * Publish or unpublish a design
  *
  * @param id The id of the design
+ * @param published weather or not the design should be published or unpublished
  */
 export async function setPublished(id: string, published: boolean) {
 	await client.sql`UPDATE uploads SET published = ${published} where ID = ${id}`;
+}
+
+/**
+ * Delete a submission
+ *
+ * @param id The id of submission to delete
+ */
+export async function deleteSubmission(id: string) {
+	await client.sql`DELETE FROM uploads WHERE id = ${id}`;
 }

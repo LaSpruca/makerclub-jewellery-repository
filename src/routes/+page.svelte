@@ -19,7 +19,7 @@
 
 <hr />
 
-<div class="flex justify-center gap-10 p-10">
+<div class="flex flex-wrap justify-center gap-10 p-10">
 	{#each $items as _, index}
 		<ViewCard {index} admin={data.is_admin} />
 	{/each}
