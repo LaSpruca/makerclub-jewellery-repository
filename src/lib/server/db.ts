@@ -21,57 +21,28 @@ export type UserRow = {
 };
 
 /**
- * Get 20 of the jewellery file that have been published
- *
- * @param offset The number of pages to skip
+ * Get the jewellery file that have been published
  */
-export async function getPublished(offset?: number) {
-	if (offset) {
-		return (
-			await client.sql<UserRow & UploadRow>`SELECT *
+export async function getPublished() {
+	return (
+		await client.sql<UserRow & UploadRow>`SELECT *
 FROM uploads
 LEFT JOIN users ON uploads.userid = users.userid
 WHERE published
-ORDER BY title desc
-LIMIT 20
-OFFSET ${offset * 20}`
-		).rows;
-	} else {
-		return (
-			await client.sql<UserRow & UploadRow>`SELECT *
-FROM uploads
-LEFT JOIN users ON uploads.userid = users.userid
-WHERE published
-ORDER BY title desc
-LIMIT 20`
-		).rows;
-	}
+ORDER BY title desc`
+	).rows;
 }
 
 /**
- * Get 20 of the jewellery items await aporval
- *
- * @param offset The number of pages to skip
+ * Get the jewellery items await aporval
  */
-export async function getItems(offset?: number) {
-	if (offset) {
-		return (
-			await client.sql<UserRow & UploadRow>`SELECT *
+export async function getItems() {
+	return (
+		await client.sql<UserRow & UploadRow>`SELECT *
 FROM uploads 
 LEFT JOIN users ON uploads.userid = users.userid
-ORDER BY title desc
-LIMIT 20
-OFFSET ${offset * 20}`
-		).rows;
-	} else {
-		return (
-			await client.sql<UserRow & UploadRow>`SELECT *
-FROM uploads 
-LEFT JOIN users ON uploads.userid = users.userid
-ORDER BY title desc
-LIMIT 20`
-		).rows;
-	}
+ORDER BY title desc`
+	).rows;
 }
 
 /**
