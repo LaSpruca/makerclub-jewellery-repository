@@ -53,13 +53,12 @@ LIMIT 20`
  *
  * @param offset The number of pages to skip
  */
-export async function getUnpublished(offset?: number) {
+export async function getItems(offset?: number) {
 	if (offset) {
 		return (
 			await client.sql<UserRow & UploadRow>`SELECT *
 FROM uploads 
 LEFT JOIN users ON uploads.userid = users.userid
-WHERE not published
 ORDER BY title desc
 LIMIT 20
 OFFSET ${offset * 20}`
@@ -69,9 +68,26 @@ OFFSET ${offset * 20}`
 			await client.sql<UserRow & UploadRow>`SELECT *
 FROM uploads 
 LEFT JOIN users ON uploads.userid = users.userid
-WHERE not published
 ORDER BY title desc
 LIMIT 20`
 		).rows;
 	}
+}
+
+/**
+ * Get a design
+ *
+ * @param id The ID of the design
+ */
+export async function getDesign(id: string) {
+	return (await client.sql<UploadRow>`SELECT * FROM uploads WHERE id = ${id} LIMIT 1`).rows[0];
+}
+
+/**
+ * Publish or unpublish a design
+ *
+ * @param id The id of the design
+ */
+export async function setPublished(id: string, published: boolean) {
+	await client.sql`UPDATE uploads SET published = ${published} where ID = ${id}`;
 }

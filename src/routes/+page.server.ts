@@ -1,9 +1,17 @@
 import type { PageServerLoad } from './$types';
-import { getUnpublished } from '$lib/server/db';
-import { createClient } from '@vercel/postgres';
+import { getItems, getPublished } from '$lib/server/db';
+import { isAdmin } from '$lib/server/auth';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ cookies }) => {
+	if (isAdmin(cookies)) {
+		return {
+			is_admin: true,
+			initial_items: await getItems()
+		};
+	}
+
 	return {
-		initial_items: await getUnpublished()
+		is_admin: false,
+		initial_items: await getPublished()
 	};
 };
